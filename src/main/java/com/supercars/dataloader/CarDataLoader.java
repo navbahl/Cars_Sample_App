@@ -27,10 +27,7 @@ import com.supercars.logging.Logger;
  */
 public class CarDataLoader {
 
-    Statement statement = null;
-    ResultSet resultSet = null;
-    
-    public void saveCar(Car car) {
+    public static void saveCar(Car car) {
         try (Connection connection = Constants.getDBConnection()) {
             PreparedStatement pstmt = connection.prepareStatement("INSERT INTO CARS(NAME, MODEL, DESCRIPTION, MANUFACTURER_ID, COLOUR, YEAR, PRICE, SUMMARY, PHOTO) SELECT ?, ?, ?, ?, ?, ?, ?, ?, 0");
             pstmt.setString(1, car.getName());
@@ -50,7 +47,7 @@ public class CarDataLoader {
         }
     }
 
-    public Car getCar(int carId) {
+    public static Car getCar(int carId) {
 
         Car car = new Car();
         Engine engine = new Engine();
@@ -58,25 +55,25 @@ public class CarDataLoader {
             String sql = "SELECT CARS.CAR_ID, NAME, MODEL, SUMMARY, DESCRIPTION, MANUFACTURER_ID, COLOUR, YEAR, PRICE, PHOTO";
             sql += " FROM CARS WHERE CARS.CAR_ID = " + carId;
 
-            //connection = Constants.getDBConnection();
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            resultSet.next();
-            // Create Car Object
-            car.setCarId(resultSet.getInt("CAR_ID"));
-            car.setName(resultSet.getString("NAME"));
-            car.setModel(resultSet.getString("MODEL"));
-            car.setSummary(resultSet.getString("SUMMARY"));
-            car.setDescription(resultSet.getString("DESCRIPTION"));
-            car.setManufacturerId(Integer.parseInt(resultSet.getString("MANUFACTURER_ID")));
-            car.setColour(resultSet.getString("COLOUR"));
-            car.setYear(resultSet.getInt("YEAR"));
-            car.setPrice(resultSet.getInt("PRICE"));
-            car.setPhoto(resultSet.getString("PHOTO"));
-            car.setManufacturer(new ManufacturerDataLoader().getManufacturer(car.getManufacturerId()));
-            
-            resultSet.close();
-            statement.close();
+            try ( //connection = Constants.getDBConnection();
+                    Statement statement = connection.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(sql);
+                resultSet.next();
+                // Create Car Object
+                car.setCarId(resultSet.getInt("CAR_ID"));
+                car.setName(resultSet.getString("NAME"));
+                car.setModel(resultSet.getString("MODEL"));
+                car.setSummary(resultSet.getString("SUMMARY"));
+                car.setDescription(resultSet.getString("DESCRIPTION"));
+                car.setManufacturerId(Integer.parseInt(resultSet.getString("MANUFACTURER_ID")));
+                car.setColour(resultSet.getString("COLOUR"));
+                car.setYear(resultSet.getInt("YEAR"));
+                car.setPrice(resultSet.getInt("PRICE"));
+                car.setPhoto(resultSet.getString("PHOTO"));
+                car.setManufacturer(new ManufacturerDataLoader().getManufacturer(car.getManufacturerId()));
+
+                resultSet.close();
+            }
         } catch (Exception e) {
             Logger.log(e);
         }
@@ -84,28 +81,32 @@ public class CarDataLoader {
         return car;
     }
 
-    public List<Car> getCarsByManufacturer(int manufacturerId) {
+    public static List<Car> getCarsByManufacturer(int manufacturerId) {
+        return getCarsByManufacturer(manufacturerId, Integer.MAX_VALUE);
+    }
+    
+    public static List<Car> getCarsByManufacturer(int manufacturerId, int limit) {
 
         List cars = new ArrayList();
         Car car;
         try (Connection connection = Constants.getDBConnection()) {
-            String sql = "SELECT CAR_ID, NAME, MODEL, SUMMARY, DESCRIPTION, PRICE, PHOTO FROM CARS WHERE MANUFACTURER_ID = " + manufacturerId;
-            
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                car = new Car();
-                car.setCarId(resultSet.getInt("CAR_ID"));
-                car.setName(resultSet.getString("NAME"));
-                car.setModel(resultSet.getString("MODEL"));
-                car.setSummary(resultSet.getString("SUMMARY"));
-                car.setDescription(resultSet.getString("DESCRIPTION"));
-                car.setPrice(resultSet.getInt("PRICE"));
-                car.setPhoto(resultSet.getString("PHOTO"));
-                cars.add(car);
+            try (PreparedStatement psmt = connection.prepareStatement("SELECT CAR_ID, NAME, MODEL, SUMMARY, DESCRIPTION, PRICE, PHOTO FROM CARS WHERE MANUFACTURER_ID = ? LIMIT ?")) {
+                psmt.setInt(1, manufacturerId);
+                psmt.setInt(2, limit);
+                try (ResultSet resultSet = psmt.executeQuery()) {
+                    while (resultSet.next()) {
+                        car = new Car();
+                        car.setCarId(resultSet.getInt("CAR_ID"));
+                        car.setName(resultSet.getString("NAME"));
+                        car.setModel(resultSet.getString("MODEL"));
+                        car.setSummary(resultSet.getString("SUMMARY"));
+                        car.setDescription(resultSet.getString("DESCRIPTION"));
+                        car.setPrice(resultSet.getInt("PRICE"));
+                        car.setPhoto(resultSet.getString("PHOTO"));
+                        cars.add(car);
+                    }
+                }
             }
-            resultSet.close();
-            statement.close();
             connection.close();
         } catch (Exception e) {
             Logger.log(e);
@@ -113,30 +114,30 @@ public class CarDataLoader {
         return cars;
     }
 
-    public List<Car> getCarsBySearch(String query) {
+    public static List<Car> getCarsBySearch(String query) {
 
         List cars = new ArrayList();
         Car car;
         try (Connection connection = Constants.getDBConnection()) {
             String sql = "SELECT CAR_ID, C.NAME, MODEL, SUMMARY, DESCRIPTION, PRICE, PHOTO, M.MANUFACTURER_ID FROM CARS C, MANUFACTURER M WHERE C.MANUFACTURER_ID = M.MANUFACTURER_ID AND (C.NAME LIKE '%" + query + "%' OR C.MODEL LIKE '%" + query + "%' OR M.NAME LIKE '%" + query + "%')";
-            
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                car = new Car();
-                car.setCarId(resultSet.getInt("CAR_ID"));
-                car.setName(resultSet.getString("NAME"));
-                car.setModel(resultSet.getString("MODEL"));
-                car.setSummary(resultSet.getString("SUMMARY"));
-                car.setDescription(resultSet.getString("DESCRIPTION"));
-                car.setPrice(resultSet.getInt("PRICE"));
-                car.setPhoto(resultSet.getString("PHOTO"));
-                car.setManufacturerId(Integer.parseInt(resultSet.getString("MANUFACTURER_ID")));
-                car.setManufacturer(new ManufacturerDataLoader().getManufacturer(car.getManufacturerId()));
-                cars.add(car);
+
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    car = new Car();
+                    car.setCarId(resultSet.getInt("CAR_ID"));
+                    car.setName(resultSet.getString("NAME"));
+                    car.setModel(resultSet.getString("MODEL"));
+                    car.setSummary(resultSet.getString("SUMMARY"));
+                    car.setDescription(resultSet.getString("DESCRIPTION"));
+                    car.setPrice(resultSet.getInt("PRICE"));
+                    car.setPhoto(resultSet.getString("PHOTO"));
+                    car.setManufacturerId(Integer.parseInt(resultSet.getString("MANUFACTURER_ID")));
+                    car.setManufacturer(new ManufacturerDataLoader().getManufacturer(car.getManufacturerId()));
+                    cars.add(car);
+                }
+                resultSet.close();
             }
-            resultSet.close();
-            statement.close();
             connection.close();
         } catch (Exception e) {
             Logger.log(e);
@@ -144,5 +145,4 @@ public class CarDataLoader {
 
         return cars;
     }
-
 }

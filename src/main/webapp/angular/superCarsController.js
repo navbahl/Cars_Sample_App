@@ -48,6 +48,13 @@ app.controller('carsController', function ($scope, $http, $location, carsUtils) 
         carsUtils.setCarId(carId);
         $location.path("/car");
     };
+    
+    $scope.getAllCars = function() {
+        $http.get("../public/car/manufacturer/" + $scope.manufacturerId + "?all=true")
+                .then (function(response) {
+                    $scope.cars = response.data;
+        });
+    };
 });
 
 app.controller('carController', function ($scope, $http, $location, carsUtils) {

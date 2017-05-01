@@ -16,6 +16,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.supercars.Car;
 import com.supercars.dataloader.CarDataLoader;
+import com.supercars.util.Util;
+import javax.ws.rs.QueryParam;
 
 /**
  *
@@ -32,13 +34,18 @@ public class CarService {
 
         return car;
     }
-    
+
     @Path("/manufacturer/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Car> getCarsForManufacturer(@PathParam("id") int id) {
-        List<Car> cars = new CarDataLoader().getCarsByManufacturer(id);
-        
+    public List<Car> getCarsForManufacturer(@PathParam("id") int id, @QueryParam("all") String all) {
+        List<Car> cars = null;
+        if (all == null) {
+            cars = CarDataLoader.getCarsByManufacturer(id, 10);
+        } else {
+            cars = CarDataLoader.getCarsByManufacturer(id);
+        }
+
         return cars;
     }
 
