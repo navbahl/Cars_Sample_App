@@ -16,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.supercars.Enquiry;
 import com.supercars.dataloader.EnquiryDataLoader;
+import javax.ws.rs.QueryParam;
 
 /**
  *
@@ -28,7 +29,7 @@ public class EnquiryService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Enquiry getEnqury(@PathParam("id") int id) {
-        Enquiry enquiry = new EnquiryDataLoader().getEnquiry(id);
+        Enquiry enquiry = EnquiryDataLoader.getEnquiry(id);
         
         return enquiry;
     }
@@ -36,9 +37,13 @@ public class EnquiryService {
     @Path("{carId}")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Enquiry> getEnquiryForCar(@PathParam("carId") int carId) {
-        List<Enquiry> enquiries = new EnquiryDataLoader().getEnquirysForCar(carId);
-        
+    public List<Enquiry> getEnquiryForCar(@PathParam("carId") int carId, @QueryParam("all") String all) {
+        List<Enquiry> enquiries = null; new EnquiryDataLoader().getEnquirysForCar(carId);
+        if (all == null) {
+            enquiries = EnquiryDataLoader.getEnquirysForCar(carId, 10);
+        } else {
+            enquiries = EnquiryDataLoader.getEnquirysForCar(carId);
+        }
         return enquiries;
     }
     

@@ -16,7 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.supercars.Car;
 import com.supercars.dataloader.CarDataLoader;
-import com.supercars.util.Util;
 import javax.ws.rs.QueryParam;
 
 /**

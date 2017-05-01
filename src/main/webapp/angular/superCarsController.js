@@ -74,6 +74,12 @@ app.controller('carController', function ($scope, $http, $location, carsUtils) {
     $scope.doError = function () {
         adddlert("This will error!");
     };
+    $scope.getAllEnquiries = function () {
+        $http.post("../public/enquiry/" + $scope.carId + "?all=true")
+                .then(function(response) {
+                    $scope.enquiries = response.data;
+        });
+    };
 });
 
 app.controller('searchController', function ($scope, $http, $location, carsUtils) {

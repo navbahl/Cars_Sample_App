@@ -24,24 +24,19 @@ import com.supercars.logging.Logger;
  */
 public class EnquiryDataLoader {
 
-    Statement statement = null;
-    ResultSet resultSet = null;
-
-    public Enquiry getEnquiry(int enquiryId) {
+    public static Enquiry getEnquiry(int enquiryId) {
 
         Enquiry enquiry = new Enquiry();
         try (Connection connection = Constants.getDBConnection()) {
             String sql = "SELECT ENQUIRY_ID, NAME, EMAIL, COMMENT, CAR_ID FROM ENQUIRIES WHERE ENQUIRY_ID = " + enquiryId;
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            resultSet.next();
-            enquiry.setEnquiryId(resultSet.getInt("ENQUIRY_ID"));
-            enquiry.setName(resultSet.getString("NAME"));
-            enquiry.setEmail(resultSet.getString("EMAIL"));
-            enquiry.setComment(resultSet.getString("COMMENT"));
-            enquiry.setCarId(resultSet.getInt("carId"));
-            resultSet.close();
-            statement.close();
+            try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+                resultSet.next();
+                enquiry.setEnquiryId(resultSet.getInt("ENQUIRY_ID"));
+                enquiry.setName(resultSet.getString("NAME"));
+                enquiry.setEmail(resultSet.getString("EMAIL"));
+                enquiry.setComment(resultSet.getString("COMMENT"));
+                enquiry.setCarId(resultSet.getInt("carId"));
+            }
             connection.close();
         } catch (Exception e) {
             Logger.log(e);
@@ -49,38 +44,42 @@ public class EnquiryDataLoader {
         return enquiry;
     }
 
-    public List<Enquiry> getEnquirysForCar(int carId) {
+    public static List<Enquiry> getEnquirysForCar(int carId) {
+        return getEnquirysForCar(carId, Integer.MAX_VALUE);
+    }
 
+    public static List<Enquiry> getEnquirysForCar(int carId, int limit) {
         List<Enquiry> enquiries = new ArrayList<Enquiry>();
         try (Connection connection = Constants.getDBConnection()) {
             String sql = "SELECT NAME, EMAIL, COMMENT FROM ENQUIRIES WHERE CAR_ID = " + carId;
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                Enquiry enquiry = new Enquiry();
-                enquiry.setName(resultSet.getString("NAME"));
-                enquiry.setEmail(resultSet.getString("EMAIL"));
-                enquiry.setComment(resultSet.getString("COMMENT"));
-                enquiries.add(enquiry);
+            try (PreparedStatement psmt = connection.prepareStatement("SELECT NAME, EMAIL, COMMENT FROM ENQUIRIES WHERE CAR_ID = ? LIMIT ?");) {
+                psmt.setInt(1, carId);
+                psmt.setInt(2, limit);
+                ResultSet resultSet = psmt.executeQuery();
+                while (resultSet.next()) {
+                    Enquiry enquiry = new Enquiry();
+                    enquiry.setName(resultSet.getString("NAME"));
+                    enquiry.setEmail(resultSet.getString("EMAIL"));
+                    enquiry.setComment(resultSet.getString("COMMENT"));
+                    enquiries.add(enquiry);
+                }
             }
-            resultSet.close();
-            statement.close();
             connection.close();
         } catch (Exception e) {
             Logger.log(e);
         }
         return enquiries;
     }
-
-    public void saveEnquiry(Enquiry enquiry) {
+            
+    public static void saveEnquiry(Enquiry enquiry) {
         try (Connection connection = Constants.getDBConnection()) {
-            PreparedStatement pstmt = connection.prepareStatement("INSERT INTO ENQUIRIES (NAME, EMAIL, COMMENT, CAR_ID, DUMMY) SELECT ?,?,?,?, SLEEP(1)");
-            pstmt.setString(1, enquiry.getName());
-            pstmt.setString(2, enquiry.getEmail());
-            pstmt.setString(3, enquiry.getComment());
-            pstmt.setInt(4, enquiry.getCarId());
-            pstmt.execute();
-            pstmt.close();
+            try (PreparedStatement pstmt = connection.prepareStatement("INSERT INTO ENQUIRIES (NAME, EMAIL, COMMENT, CAR_ID, DUMMY) SELECT ?,?,?,?, SLEEP(1)")) {
+                pstmt.setString(1, enquiry.getName());
+                pstmt.setString(2, enquiry.getEmail());
+                pstmt.setString(3, enquiry.getComment());
+                pstmt.setInt(4, enquiry.getCarId());
+                pstmt.execute();
+            }
             connection.close();
         } catch (Exception e) {
             Logger.log(e);
