@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import javax.sql.DataSource;
 
 /**
@@ -48,6 +47,8 @@ public class Constants {
                     upgradeToSchema_3();
                 case 3:
                     upgradeToSchema_4();
+                case 4:
+                    upgrateToSchema_5();
                 default:
             }
         } catch (SQLException | PreferenceException ex) {
@@ -90,6 +91,16 @@ public class Constants {
         return null;
     }
 
+    public static int getSleepTime() {
+        int sleepTime = 0;
+        try {
+            sleepTime = Integer.parseInt(PreferenceManager.getPreference("QUERY_SLEEP").getValue());
+        } catch (PreferenceException ex) {
+            com.supercars.logging.Logger.log(ex);
+        }
+        return sleepTime;
+    }
+
     private static boolean checkPropertiesTableExist() throws SQLException {
         boolean exists = false;
         try (Connection connection = getDBConnectionStandardPool(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'supercars' AND table_name = 'PREFERENCES'")) {
@@ -130,5 +141,10 @@ public class Constants {
     private static void upgradeToSchema_4() throws PreferenceException, SQLException {
         PreferenceManager.updatePreference(new Preference("CONNECTION_POOL", "jdbc/standard", "Connection pool to use, either 'jdbc/standard' or 'jdbc/c3p0'", false));
         updateSchemaVersion(4);
+    }
+
+    private static void upgrateToSchema_5() throws PreferenceException, SQLException {
+        PreferenceManager.updatePreference(new Preference("QUERY_SLEEP", "2", "Sleep time for get all Cars and Enquiries", false));
+        updateSchemaVersion(5);
     }
 }

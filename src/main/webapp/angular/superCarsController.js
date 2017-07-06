@@ -16,6 +16,13 @@ app.controller('homeController', function ($scope, $http, $location, carsUtils) 
     $http.get("../public/user")
             .then(function (response) {
                 $scope.currentUser = response.data;
+                window['adrum-config']['userEventInfo']['VPageView'] = function (context) {
+                    return {
+                        userData: {
+                            user_name: $scope.currentUser.username.toString(),
+                        }
+                    }
+                };
             });
     $scope.search = function () {
         carsUtils.setSearchTerm($scope.searchTerm)
@@ -48,12 +55,12 @@ app.controller('carsController', function ($scope, $http, $location, carsUtils) 
         carsUtils.setCarId(carId);
         $location.path("/car");
     };
-    
-    $scope.getAllCars = function() {
+
+    $scope.getAllCars = function () {
         $http.get("../public/car/manufacturer/" + $scope.manufacturerId + "?all=true")
-                .then (function(response) {
+                .then(function (response) {
                     $scope.cars = response.data;
-        });
+                });
     };
 });
 
@@ -76,9 +83,9 @@ app.controller('carController', function ($scope, $http, $location, carsUtils) {
     };
     $scope.getAllEnquiries = function () {
         $http.post("../public/enquiry/" + $scope.carId + "?all=true")
-                .then(function(response) {
+                .then(function (response) {
                     $scope.enquiries = response.data;
-        });
+                });
     };
 });
 
@@ -189,8 +196,8 @@ app.controller('preferencesController', function ($scope, $http) {
             .then(function (response) {
                 $scope.preferences = response.data;
             });
-            $scope.savePreferences = function() {
-                $http.post("../public/preferences/all", $scope.preferences);
-                $location.path("/preferences");
-            }
+    $scope.savePreferences = function () {
+        $http.post("../public/preferences/all", $scope.preferences);
+        $location.path("/preferences");
+    }
 });

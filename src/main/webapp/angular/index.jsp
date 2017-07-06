@@ -8,6 +8,21 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script>
+            console.log("Some output");
+            window['adrum-config'] = {
+                userEventInfo: {
+                    "PageView": function (context) {
+                        console.log("User Data Fired");
+                        return {
+                            userData: {
+                                user_page: "TestPage" //$scope.currentUser.username.toString(),
+                            }
+                        }
+                    }
+                }
+            };
+        </script>
         <script src="angular.js"></script>
         <script src="angular-route.js"></script>
         <title>Supercar Trader</title>

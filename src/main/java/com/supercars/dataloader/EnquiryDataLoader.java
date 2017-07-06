@@ -52,9 +52,14 @@ public class EnquiryDataLoader {
         List<Enquiry> enquiries = new ArrayList<Enquiry>();
         try (Connection connection = Constants.getDBConnection()) {
             String sql = "SELECT NAME, EMAIL, COMMENT FROM ENQUIRIES WHERE CAR_ID = " + carId;
-            try (PreparedStatement psmt = connection.prepareStatement("SELECT NAME, EMAIL, COMMENT FROM ENQUIRIES WHERE CAR_ID = ? LIMIT ?");) {
-                psmt.setInt(1, carId);
-                psmt.setInt(2, limit);
+            try (PreparedStatement psmt = connection.prepareStatement("SELECT NAME, EMAIL, COMMENT, SLEEP(?) FROM ENQUIRIES WHERE CAR_ID = ? LIMIT ?");) {
+                int sleep = 0;
+                if (limit > 100) {
+                    sleep = 1;
+                }
+                psmt.setInt(1, sleep);
+                psmt.setInt(2, carId);
+                psmt.setInt(3, limit);
                 ResultSet resultSet = psmt.executeQuery();
                 while (resultSet.next()) {
                     Enquiry enquiry = new Enquiry();

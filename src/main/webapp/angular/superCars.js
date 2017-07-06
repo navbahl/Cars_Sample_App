@@ -5,6 +5,9 @@
  */
 
 var app = angular.module('superCars', ["ngRoute"]);
+angular.element(document).ready(function () {
+    angular.bootstrap(document, ['superCars']);
+});
 app.config(function ($routeProvider) {
     $routeProvider.when("/", {
         templateUrl: "home.html",
