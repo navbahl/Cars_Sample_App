@@ -4,16 +4,18 @@
  * and open the template in the editor.
  */
 
+var restLocation = 'http://localhost:8080/Cars_Sample_App'
+
 app.controller('mainController', function ($scope) {
 
 });
 
 app.controller('homeController', function ($scope, $http, $location, carsUtils) {
-    $http.get("../public/fuel")
+    $http.get(restLocation + "/public/fuel")
             .then(function (response) {
                 $scope.fuelPrices = response.data;
             });
-    $http.get("../public/user")
+    $http.get(restLocation + "/public/user")
             .then(function (response) {
                 $scope.currentUser = response.data;
             });
@@ -24,7 +26,7 @@ app.controller('homeController', function ($scope, $http, $location, carsUtils) 
 });
 
 app.controller('manufacturerController', function ($scope, $http, $location, carsUtils) {
-    $http.get("../public/manufacturer")
+    $http.get(restLocation + "/public/manufacturer")
             .then(function (response) {
                 $scope.manufacturers = response.data;
             });
@@ -36,11 +38,11 @@ app.controller('manufacturerController', function ($scope, $http, $location, car
 
 app.controller('carsController', function ($scope, $http, $location, carsUtils) {
     $scope.manufacturerId = carsUtils.getManufacturerId();
-    $http.get("../public/car/manufacturer/" + $scope.manufacturerId)
+    $http.get(restLocation + "/public/car/manufacturer/" + $scope.manufacturerId)
             .then(function (response) {
                 $scope.cars = response.data;
             });
-    $http.get("../public/manufacturer/" + $scope.manufacturerId)
+    $http.get(restLocation + "/public/manufacturer/" + $scope.manufacturerId)
             .then(function (response) {
                 $scope.manufacturer = response.data;
             });
@@ -52,11 +54,11 @@ app.controller('carsController', function ($scope, $http, $location, carsUtils) 
 
 app.controller('carController', function ($scope, $http, $location, carsUtils) {
     $scope.carId = carsUtils.getCarId();
-    $http.get("../public/car/" + $scope.carId)
+    $http.get(restLocation + "/public/car/" + $scope.carId)
             .then(function (response) {
                 $scope.car = response.data;
             });
-    $http.post("../public/enquiry/" + $scope.carId)
+    $http.post(restLocation + "/public/enquiry/" + $scope.carId)
             .then(function (response) {
                 $scope.enquiries = response.data;
             });
@@ -74,13 +76,13 @@ app.controller('searchController', function ($scope, $http, $location, carsUtils
         $scope.searchTerm = carsUtils.getSearchTerm();
     }
     if ($scope.searchTerm !== null) {
-        $http.post("../public/car/" + $scope.searchTerm)
+        $http.post(restLocation + "/public/car/" + $scope.searchTerm)
                 .then(function (response) {
                     $scope.cars = response.data;
                 });
     }
     $scope.search = function () {
-        $http.post("../public/car/" + $scope.searchTerm)
+        $http.post(restLocation + "/public/car/" + $scope.searchTerm)
                 .then(function (response) {
                     $scope.cars = response.data;
                 });
@@ -92,7 +94,7 @@ app.controller('searchController', function ($scope, $http, $location, carsUtils
 });
 
 app.controller('sellController', function ($scope, $http, $location) {
-    $http.get("../public/manufacturer")
+    $http.get(restLocation + "/public/manufacturer")
             .then(function (response) {
                 $scope.manufacturers = response.data;
             });
@@ -110,14 +112,14 @@ app.controller('sellController', function ($scope, $http, $location) {
         carJSON["tyreSize"] = 0;
         carJSON["photo"] = "0";
         carJSON["manual"] = false;
-        $http.put("../public/car", carJSON);
+        $http.put(restLocation + "/public/car", carJSON);
         $location.path("/thankyou");
     };
 });
 
 app.controller('enquireController', function ($scope, $http, $location, carsUtils) {
     $scope.carId = carsUtils.getCarId();
-    $http.get("../public/car/" + $scope.carId)
+    $http.get(restLocation + "/public/car/" + $scope.carId)
             .then(function (response) {
                 $scope.car = response.data;
             });
@@ -127,26 +129,26 @@ app.controller('enquireController', function ($scope, $http, $location, carsUtil
         enquiryJSON["email"] = $scope.email;
         enquiryJSON["comment"] = $scope.comment;
         enquiryJSON["carId"] = $scope.car.carId;
-        $http.put("../public/enquiry", enquiryJSON);
+        $http.put(restLocation + "/public/enquiry", enquiryJSON);
         $location.path("/thankyou");
     };
 });
 
 app.controller('leakController', function ($scope, $http) {
-    $http.get("../public/leak")
+    $http.get(restLocation + "/public/leak")
             .then(function (response) {
                 $scope.leakSize = response.data;
             });
     $scope.addToLeak = function () {
-        $http.get("../public/leak/" + $scope.number + "/" + $scope.size);
-        $http.get('../public/leak')
+        $http.get(restLocation + "/public/leak/" + $scope.number + "/" + $scope.size);
+        $http.get(restLocation + "/public/leak")
                 .then(function (response) {
                     $scope.leakSize = response.data;
                 });
     };
     $scope.resetLeak = function () {
-        $http.delete("../public/leak");
-        $http.get('../public/leak')
+        $http.delete(restLocation + "/public/leak");
+        $http.get(restLocation + "/public/leak")
                 .then(function (response) {
                     $scope.leakSize = response.data;
                 });
@@ -158,26 +160,26 @@ app.controller('loginController', function ($scope, $http, $location) {
         var loginJSON = {};
         loginJSON["username"] = $scope.username;
         loginJSON["password"] = $scope.password;
-        $http.post("../public/user/login", loginJSON);
+        $http.post(restLocation + "/public/user/login", loginJSON);
         $location.path("/home");
     };
 });
 
 app.controller('logoutController', function ($scope, $http) {
-    $http.get("../public/user")
+    $http.get(restLocation + "/public/user")
             .then(function (response) {
                 $scope.currentUser = response.data;
             });
-    $http.get("../public/user/logout");
+    $http.get(restLocation + "/public/user/logout");
 });
 
 app.controller('preferencesController', function ($scope, $http) {
-    $http.get("../public/preferences/all")
+    $http.get(restLocation + "/public/preferences/all")
             .then(function (response) {
                 $scope.preferences = response.data;
             });
             $scope.savePreferences = function() {
-                $http.post("../public/preferences/all", $scope.preferences);
+                $http.post(restLocation + "/public/preferences/all", $scope.preferences);
                 $location.path("/preferences");
             }
 });
