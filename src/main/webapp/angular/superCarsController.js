@@ -18,6 +18,13 @@ app.controller('homeController', function ($scope, $http, $location, carsUtils) 
     $http.get(restLocation + "/public/user")
             .then(function (response) {
                 $scope.currentUser = response.data;
+                window['adrum-config']['userEventInfo']['VPageView'] = function (context) {
+                    return {
+                        userData: {
+                            user_name: $scope.currentUser.username.toString(),
+                        }
+                    }
+                };
             });
     $scope.search = function () {
         carsUtils.setSearchTerm($scope.searchTerm)
@@ -178,8 +185,8 @@ app.controller('preferencesController', function ($scope, $http) {
             .then(function (response) {
                 $scope.preferences = response.data;
             });
-            $scope.savePreferences = function() {
-                $http.post(restLocation + "/public/preferences/all", $scope.preferences);
-                $location.path("/preferences");
-            }
+    $scope.savePreferences = function () {
+        $http.post(restLocation + "/public/preferences/all", $scope.preferences);
+        $location.path("/preferences");
+    }
 });
