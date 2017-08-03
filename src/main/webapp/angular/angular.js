@@ -2638,7 +2638,7 @@ function publishExternalAPI(angular) {
         $$forceReflow: $$ForceReflowProvider,
         $interpolate: $InterpolateProvider,
         $interval: $IntervalProvider,
-        $http: $HttpProvide$Httpr,
+        $http: $HttpProvider,
         $httpParamSerializer: $HttpParamSerializerProvider,
         $httpParamSerializerJQLike: $HttpParamSerializerJQLikeProvider,
         $httpBackend: $HttpBackendProvider,
