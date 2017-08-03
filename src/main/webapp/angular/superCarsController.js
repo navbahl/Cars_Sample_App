@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-var restLocation = 'http://localhost:8080/Cars_Sample_App'
+var restLocation = '..'
 
 app.controller('mainController', function ($scope) {
 
