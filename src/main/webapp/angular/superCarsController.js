@@ -11,7 +11,7 @@ app.controller('mainController', function ($scope) {
 });
 
 app.controller('homeController', function ($scope, $http, $location, carsUtils) {
-    $http.get(restLocation + "/public/fuel")
+    $http.get('http://tmobileh-sb01.apigee.net/sampleguid')
             .then(function (response) {
                 $scope.fuelPrices = response.data;
             });
