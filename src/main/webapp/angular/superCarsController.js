@@ -14,9 +14,7 @@ app.controller('homeController', function ($scope, $http, $location, carsUtils) 
     $http.get('http://tmobileh-sb01.apigee.net/sampleguid')
             .then(function (response) {
                 $scope.fuelPrices = response.data;
-                console.log(response.headers());
                 window['adrum-config']['userEventInfo']['Ajax'] = function(context) {
-                    console.log(response.headers('X-Apigee-Response-Time'));
                     return {
                         userDataDouble: {
                             ApigeeResponseTime: parseFloat(response.headers('X-Apigee-Response-Time')),
