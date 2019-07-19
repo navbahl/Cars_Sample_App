@@ -49,7 +49,7 @@ This app uses [Maven](https://maven.apache.org) for the build. To get a build en
 	1. Test using the command "mvn". This should run Maven and indicate "Build Failure"
 1. Use git to get the source code
 	<pre><code>
- 	git clone https://github.com/tombatchelor/Cars_Sample_App.git
+ 	git clone https://github.com/Appdynamics/Cars_Sample_App.git
  	</code></pre>
 1. Change to the Cars_Sample_App directory and then execute the following for the build
 	<pre><code>
