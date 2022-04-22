@@ -12,7 +12,7 @@ export const options = {
     { target: 0, duration: '2s' },
   ],
   thresholds: {
-    http_req_duration: ['p(95) < 10'],
+    http_req_duration: ['p(95) < 100'],
   },
 };
 
