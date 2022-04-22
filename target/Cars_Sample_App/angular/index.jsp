@@ -40,6 +40,11 @@
                         </a>
                     </td>
                     <td>
+                        <a href="#enquire">
+                            <img src="images/enquire_but.gif">
+                        </a>
+                    </td>
+                    <td>
                         <a href="#insurance">
                             <img src="images/insurance_but.gif">
                         </a>
@@ -55,6 +60,7 @@
         </div>
         <br />
         <IMG SRC="images/pipe.gif">
+        <script src="superCars.js"></script>
         <script src="superCarsController.js"></script>
     </body>
 </html>
